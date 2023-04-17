@@ -13,6 +13,8 @@ import {
 import { TextInput } from "src/components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
+import tryCatchRequest from "src/global/utils/tryCatchRequest";
+import { api } from "src/services/api";
 
 export default function Login() {
   const [email, setEmail] = React.useState("");
@@ -24,6 +26,25 @@ export default function Login() {
   const isButtonDisabled = !isEmailValid || password.length < 6;
 
   const navigation = useNavigation<StackNavigationProp<any>>();
+
+  async function login() {
+    const user = {
+      email,
+      password,
+    };
+
+    const { response, error } = await tryCatchRequest(
+      api.post("/users/login", user)
+    );
+
+    if (error || response?.status !== 200) {
+      console.log(error);
+      return;
+    }
+
+    console.log(response.data);
+    navigation.navigate("TabContainer");
+  }
 
   return (
     <Container>
@@ -42,10 +63,7 @@ export default function Login() {
         secureTextEntry={true}
         autoCapitalize={"none"}
       />
-      <OutlinedButton
-        disabled={isButtonDisabled}
-        onPress={() => navigation.navigate("TabContainer")}
-      >
+      <OutlinedButton disabled={isButtonDisabled} onPress={login}>
         <ButtonText>Sign in</ButtonText>
       </OutlinedButton>
       <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>

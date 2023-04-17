@@ -13,6 +13,8 @@ import {
 import { TextInput } from "src/components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
+import tryCatchRequest from "src/global/utils/tryCatchRequest";
+import { api } from "src/services/api";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
@@ -32,6 +34,41 @@ export default function SignUp() {
   const isButtonDisabled = !isEmailValid || password.length < 6;
 
   const navigation = useNavigation<StackNavigationProp<any>>();
+
+  function formatDate(dateString: string) {
+    const [day, month, year] = dateString.split("/").map(Number);
+
+    const date = new Date(year, month - 1, day);
+
+    return date.toString();
+  }
+
+  async function createUser() {
+    const user = {
+      fullName,
+      email,
+      password,
+      phoneNumber,
+      dateOfBirth: formatDate(dateOfBirth),
+      gender,
+      location,
+      skillLevel,
+      preferredPosition,
+      teamPreferences,
+    };
+
+    console.log(user);
+
+    const { response, error } = await tryCatchRequest(api.post("/users", user));
+
+    if (error || response?.status !== 201) {
+      console.log(error);
+      return;
+    }
+
+    console.log(response);
+    navigation.navigate("Login");
+  }
 
   return (
     <Container>
@@ -101,10 +138,7 @@ export default function SignUp() {
         autoCapitalize={"words"}
       />
 
-      <OutlinedButton
-        disabled={isButtonDisabled}
-        onPress={() => navigation.navigate("Login")}
-      >
+      <OutlinedButton disabled={isButtonDisabled} onPress={createUser}>
         <ButtonText>Sign Up</ButtonText>
       </OutlinedButton>
       <TouchableOpacity onPress={() => navigation.navigate("Login")}>
