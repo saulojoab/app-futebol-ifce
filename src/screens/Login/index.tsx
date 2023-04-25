@@ -5,14 +5,18 @@ import { useNavigation } from "@react-navigation/native";
 
 import {
   Container,
+  Logo,
   Title,
   ButtonText,
+  ForgotText,
   OutlinedButton,
+  ForgotPassword,
   SignupText,
 } from "./styles";
 import { TextInput } from "src/components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
+import logo from "../../assets/images/Gamefinder-4.png";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 
@@ -48,7 +52,8 @@ export default function Login() {
 
   return (
     <Container>
-      <Title>Login</Title>
+      <Logo source={logo} />
+      <Title>Olá, seja bem vindo(a)</Title>
       <TextInput
         value={email}
         onChangeText={(text) => setEmail(text)}
@@ -59,15 +64,19 @@ export default function Login() {
       <TextInput
         value={password}
         onChangeText={(text) => setPassword(text)}
-        placeholder="Password"
+        placeholder="Senha"
         secureTextEntry={true}
         autoCapitalize={"none"}
       />
+      <ForgotPassword onPress={() => console.log("Forgot")}>
+        <ForgotText>Esqueci minha senha</ForgotText>
+      </ForgotPassword>
       <OutlinedButton disabled={isButtonDisabled} onPress={login}>
-        <ButtonText>Sign in</ButtonText>
+        <ButtonText>Entrar</ButtonText>
       </OutlinedButton>
+      
       <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-        <SignupText>Don't have an account? Sign up</SignupText>
+        <SignupText>Não possui uma conta? Cadastre-se</SignupText>
       </TouchableOpacity>
     </Container>
   );
