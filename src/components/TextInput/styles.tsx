@@ -5,11 +5,12 @@ import responsive from "src/global/utils/responsive";
 export const TextInput = styled.TextInput<TextInputProps>`
   height: ${responsive(40)}px;
   width: 100%;
-  border-width: 1px;
-  border-color: #ccc;
+  border-width: 1.5px;
+  border-color: ${(props) => props.theme.colors.primary};
   background-color: ${(props) => props.theme.colors.white};
-  border-radius: 5px;
+  border-radius: 7.5px;
   padding: ${responsive(10)}px;
   font-size: ${responsive(16)}px;
-  margin-top: ${responsive(10)}px;
+  margin-top: ${responsive(12)}px;
+  min-height: 40px;
 `;
