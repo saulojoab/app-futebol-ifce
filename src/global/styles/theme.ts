@@ -1,7 +1,10 @@
 export default {
   colors: {
-    primary: "#5E81AC",
-    black: "#000000",
+    primary: "#005EAA",
+    secondary: "#004f8b",
+    background: "#0091a4",
+    seaBlue: "#00a49b",
+    black: "#252525",
     white: "#FFFFFF",
     gray: "#E5E5E5",
   },
