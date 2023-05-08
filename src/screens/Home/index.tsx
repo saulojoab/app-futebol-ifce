@@ -31,12 +31,8 @@ export default function Home() {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-        region={{
-          latitude: currentPosition?.latitude || 37.78825,
-          longitude: currentPosition?.longitude || -122.4324,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
+        followsUserLocation
+        showsUserLocation
       />
     </Container>
   );
