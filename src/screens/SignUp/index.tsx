@@ -12,12 +12,12 @@ import {
   ButtonText,
   OutlinedButton,
   SignupText,
-  PasswordError
+  PasswordError,
 } from "./styles";
 import { TextInput } from "src/components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TouchableOpacity, View } from "react-native";
-import logo from "../../assets/images/Gamefinder-4.png";
+import logo from "src/assets/images/Gamefinder-4.png";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 
@@ -34,7 +34,8 @@ export default function SignUp() {
   const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
   const isEmailValid = emailRegex.test(email);
-  const isButtonDisabled = !isEmailValid || password.length < 6 && confirmPassword != password;
+  const isButtonDisabled =
+    !isEmailValid || (password.length < 6 && confirmPassword != password);
 
   const navigation = useNavigation<StackNavigationProp<any>>();
 
@@ -88,7 +89,7 @@ export default function SignUp() {
         keyboardType={"email-address"}
       />
 
-      <FlexView>   
+      <FlexView>
         <RowInput
           value={phoneNumber}
           onChangeText={(text) => setPhoneNumber(text)}
@@ -135,7 +136,9 @@ export default function SignUp() {
         />
       </FlexView>
 
-      {confirmPassword != password && <PasswordError>Senhas não coinscidem!</PasswordError>}
+      {confirmPassword != password && (
+        <PasswordError>Senhas não coinscidem!</PasswordError>
+      )}
 
       <OutlinedButton disabled={isButtonDisabled} onPress={createUser}>
         <ButtonText>Cadastrar</ButtonText>

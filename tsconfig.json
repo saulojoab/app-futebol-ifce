@@ -6,7 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "react",
-    "lib": ["es6"],
+    "lib": ["ES2022"],
     "moduleResolution": "node",
     "noEmit": true,
     "strict": true,

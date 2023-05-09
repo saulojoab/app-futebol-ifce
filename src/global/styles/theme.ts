@@ -7,6 +7,7 @@ export default {
     black: "#252525",
     white: "#FFFFFF",
     gray: "#E5E5E5",
+    success: "#00A49B",
   },
   shadows: {
     light: 1,

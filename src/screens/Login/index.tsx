@@ -16,7 +16,7 @@ import {
 import { TextInput } from "src/components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
-import logo from "../../assets/images/Gamefinder-4.png";
+import logo from "src/assets/images/Gamefinder-4.png";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 
@@ -68,13 +68,16 @@ export default function Login() {
         secureTextEntry={true}
         autoCapitalize={"none"}
       />
-      <ForgotPassword onPress={() => console.log("Forgot")}>
+      <ForgotPassword
+        disabled={isButtonDisabled}
+        onPress={() => console.log("Forgot")}
+      >
         <ForgotText>Esqueci minha senha</ForgotText>
       </ForgotPassword>
       <OutlinedButton disabled={isButtonDisabled} onPress={login}>
         <ButtonText>Entrar</ButtonText>
       </OutlinedButton>
-      
+
       <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
         <SignupText>Não possui uma conta? Cadastre-se</SignupText>
       </TouchableOpacity>

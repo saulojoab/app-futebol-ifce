@@ -29,8 +29,11 @@ export const OutlinedButton = styled.TouchableOpacity<ButtonProps>`
   height: ${responsive(45)}px;
   width: 75%;
   background-color: ${(props) =>
-    props.disabled ? props.theme.colors.background : props.theme.colors.secondary};
-    border: 1.4px solid ${(props) =>
+    props.disabled
+      ? props.theme.colors.background
+      : props.theme.colors.secondary};
+  border: 1.4px solid
+    ${(props) =>
       props.disabled ? props.theme.colors.primary : props.theme.colors.primary};
   border-radius: 7.5px;
   padding: ${responsive(10)}px;
