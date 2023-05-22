@@ -23,6 +23,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 import { ActivityIndicator } from "react-native";
+import { useAppSelector } from "src/hooks/redux";
 
 export default function CreateGame() {
   const [dateTime, setDateTime] = React.useState<string>("");
@@ -34,6 +35,7 @@ export default function CreateGame() {
   const [loading, setLoading] = React.useState(false);
 
   const navigation = useNavigation<StackNavigationProp<any>>();
+  const user = useAppSelector((state) => state.auth.user);
 
   Geolocation.getCurrentPosition(
     (position) => {
@@ -55,7 +57,7 @@ export default function CreateGame() {
       title,
       description,
       location: gameLocation,
-      organizer: "64596654f710fb047282cc65",
+      organizer: user._id,
     };
 
     console.log(game);

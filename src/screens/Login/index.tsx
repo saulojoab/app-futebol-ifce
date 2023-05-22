@@ -15,14 +15,17 @@ import {
 } from "./styles";
 import { TextInput } from "src/components";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { TouchableOpacity } from "react-native";
+import { ActivityIndicator, TouchableOpacity } from "react-native";
 import logo from "src/assets/images/Gamefinder-4.png";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
+import { setLoginStatus, updateUser } from "src/redux/features/authSlice";
+import { useAppDispatch } from "src/hooks/redux";
 
 export default function Login() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
@@ -31,11 +34,17 @@ export default function Login() {
 
   const navigation = useNavigation<StackNavigationProp<any>>();
 
+  const dispatch = useAppDispatch();
+
   async function login() {
+    setLoading(true);
+
     const user = {
       email,
       password,
     };
+
+    console.log(user);
 
     const { response, error } = await tryCatchRequest(
       api.post("/users/login", user)
@@ -43,10 +52,16 @@ export default function Login() {
 
     if (error || response?.status !== 200) {
       console.log(error);
+      setLoading(false);
       return;
     }
 
-    console.log(response.data);
+    dispatch(setLoginStatus(true));
+    dispatch(updateUser(response.data.user));
+
+    console.log(response.data.user);
+
+    setLoading(false);
     navigation.navigate("TabContainer");
   }
 
@@ -74,8 +89,12 @@ export default function Login() {
       >
         <ForgotText>Esqueci minha senha</ForgotText>
       </ForgotPassword>
-      <OutlinedButton disabled={isButtonDisabled} onPress={login}>
-        <ButtonText>Entrar</ButtonText>
+      <OutlinedButton disabled={isButtonDisabled || loading} onPress={login}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <ButtonText>Entrar</ButtonText>
+        )}
       </OutlinedButton>
 
       <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>

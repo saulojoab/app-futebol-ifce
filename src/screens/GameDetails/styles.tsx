@@ -89,3 +89,18 @@ export const JoinedGameButton = styled.TouchableOpacity`
   shadow-radius: 3.84px;
   elevation: 5;
 `;
+
+export const StarRatingContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: ${responsive(20)}px;
+`;
+
+export const StarRatingLabel = styled.Text`
+  font-size: ${responsive(20)}px;
+  color: ${(props) => props.theme.colors.black};
+  margin-left: ${responsive(10)}px;
+  font-weight: 200;
+`;

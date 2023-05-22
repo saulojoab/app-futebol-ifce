@@ -4,13 +4,13 @@ import styled from "styled-components/native";
 export const Container = styled.View`
   flex: 1;
   background-color: ${(props) => props.theme.colors.white};
-  padding: 10px;
-  padding-top: 60px;
+  padding: 30px;
+  padding-top: 50px;
 `;
 
 export const Title = styled.Text`
   color: ${(props) => props.theme.colors.black};
-  font-size: ${responsive(30)}px;
+  font-size: ${responsive(25)}px;
   margin-left: ${responsive(10)}px;
 `;
 
@@ -33,7 +33,7 @@ export const CreateGameButtonText = styled.Text`
 
 export const GameContainer = styled.TouchableOpacity`
   padding: ${responsive(10)}px;
-  border-radius: ${responsive(50)}px;
+  border-radius: ${responsive(20)}px;
   margin-top: ${responsive(10)}px;
   display: flex;
   flex-direction: row;
@@ -73,4 +73,22 @@ export const GameInformationContainer = styled.View`
   justify-content: center;
   border-top-right-radius: ${responsive(50)}px;
   border-bottom-right-radius: ${responsive(50)}px;
+`;
+
+export const HeaderContainer = styled.View`
+  background-color: ${(props) => props.theme.colors.white};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const GoBackButton = styled.TouchableOpacity`
+  background-color: ${(props) => props.theme.colors.primary};
+  padding: 20px;
+  border-radius: 50px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
 `;

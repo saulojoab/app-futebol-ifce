@@ -8,8 +8,10 @@ import {
   JoinGameButton,
   JoinGameButtonText,
   JoinedGameButton,
+  StarRatingContainer,
   Title,
   TopMapContainer,
+  StarRatingLabel,
 } from "./styles";
 import MapView from "react-native-maps";
 import { useNavigation } from "@react-navigation/native";
@@ -18,6 +20,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 import { ActivityIndicator } from "react-native";
+import { StarRating } from "src/components";
+import { useAppSelector } from "src/hooks/redux";
 
 export interface UserProps {
   _id: string;
@@ -36,8 +40,13 @@ export default function GameDetails({ route }: any) {
   const [isJoined, setIsJoined] = React.useState(false);
   const [loadingGameData, setLoadingGameData] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [loadingGameRating, setLoadingGameRating] = React.useState(false);
+  const [ratingFromGame, setRatingFromGame] = React.useState<number>();
+  const [rating, setRating] = React.useState(0);
+  const [hasRated, setHasRated] = React.useState(false);
 
   const navigation = useNavigation<StackNavigationProp<any>>();
+  const user = useAppSelector((state) => state.auth.user);
 
   async function getGameData() {
     setLoadingGameData(true);
@@ -63,9 +72,82 @@ export default function GameDetails({ route }: any) {
     setLoadingGameData(false);
   }
 
+  async function getRatingFromGame() {
+    setLoadingGameRating(true);
+    const { response, error } = await tryCatchRequest(
+      api.get(`/ratings/game/${gameFromParams._id}`)
+    );
+
+    if (error || response?.status !== 200) {
+      console.log(error);
+      setLoadingGameRating(false);
+      return;
+    }
+
+    console.log(response.data);
+
+    let sum = 0;
+
+    response.data.map((item: any) => {
+      sum += item.rating;
+    });
+
+    console.log(sum / response.data.length);
+    setLoadingGameRating(false);
+
+    setRatingFromGame(sum / response.data.length);
+  }
+
+  async function getCurrentRatingFromUser() {
+    const { response, error } = await tryCatchRequest(
+      api.get(`/ratings/${gameFromParams._id}/${user._id}`)
+    );
+
+    if (error || response?.status !== 200) {
+      console.log(error);
+      setHasRated(false);
+      return;
+    }
+
+    if (response.data?.rating) {
+      setHasRated(true);
+      setRating(response.data.rating);
+    }
+  }
+
   useEffect(() => {
     getGameData();
+    getCurrentRatingFromUser();
   }, []);
+
+  useEffect(() => {
+    getRatingFromGame();
+  }, [rating]);
+
+  async function onRating(rating: number) {
+    setRating(rating);
+
+    const { response, error } = await tryCatchRequest(
+      !hasRated
+        ? api.post(`/ratings`, {
+            game: gameFromParams._id,
+            user: user._id,
+            rating,
+          })
+        : api.put(`/ratings`, {
+            game: gameFromParams._id,
+            user: user._id,
+            rating,
+          })
+    );
+
+    if (error || (response?.status !== 201 && response?.status !== 200)) {
+      console.log(error);
+      return;
+    }
+
+    setHasRated(true);
+  }
 
   function formatDateTime(dateTime: Date) {
     const date = new Date(dateTime);
@@ -140,6 +222,17 @@ export default function GameDetails({ route }: any) {
       </TopMapContainer>
       <Title>{game?.title}</Title>
       <DateAndTime>{formatDateTime(game?.dateTime || new Date())}</DateAndTime>
+      <StarRatingContainer>
+        <StarRating rating={rating} onPress={onRating} />
+        {loadingGameRating ? (
+          <ActivityIndicator />
+        ) : (
+          <StarRatingLabel>
+            {ratingFromGame ? ratingFromGame.toFixed(1) : 0}/5
+          </StarRatingLabel>
+        )}
+      </StarRatingContainer>
+
       <Description>{game?.description}</Description>
       {gameHasPlayers ? (
         <Description style={{ fontWeight: "bold" }}>

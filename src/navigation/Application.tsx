@@ -13,7 +13,13 @@ import {
   Games,
   CreateGame,
   GameDetails,
-} from "../screens";
+  Profile,
+  UserGames,
+  EditProfile,
+} from "src/screens";
+import { Provider } from "react-redux";
+import { store, persistor } from "src/redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -41,22 +47,38 @@ function TabContainer() {
           unmountOnBlur: true,
         }}
       />
+      <Tab.Screen
+        name="Perfil"
+        component={Profile}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="user" color={color} size={size} />
+          ),
+          unmountOnBlur: true,
+        }}
+      />
     </Tab.Navigator>
   );
 }
 
 export default function Application() {
   return (
-    <ThemeProvider theme={theme}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen name="CreateGame" component={CreateGame} />
-          <Stack.Screen name="GameDetails" component={GameDetails} />
-          <Stack.Screen name="TabContainer" component={TabContainer} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ThemeProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider theme={theme}>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="SignUp" component={SignUp} />
+              <Stack.Screen name="CreateGame" component={CreateGame} />
+              <Stack.Screen name="GameDetails" component={GameDetails} />
+              <Stack.Screen name="TabContainer" component={TabContainer} />
+              <Stack.Screen name="UserGames" component={UserGames} />
+              <Stack.Screen name="EditProfile" component={EditProfile} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ThemeProvider>
+      </PersistGate>
+    </Provider>
   );
 }

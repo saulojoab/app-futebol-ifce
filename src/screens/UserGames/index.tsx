@@ -3,15 +3,15 @@
 import React, { useEffect } from "react";
 import {
   Container,
-  CreateGameButton,
-  CreateGameButtonText,
   GameContainer,
   GameDescription,
   GameInformationContainer,
   GameListingContainer,
   GameTitle,
+  GoBackButton,
   MapContainer,
   Title,
+  HeaderContainer,
 } from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -20,6 +20,8 @@ import { api } from "src/services/api";
 import { RefreshControl } from "react-native";
 import MapView from "react-native-maps";
 import responsive from "src/global/utils/responsive";
+import { useAppSelector } from "src/hooks/redux";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export interface Game {
   _id: string;
@@ -35,25 +37,16 @@ export interface Game {
 }
 
 export default function Games() {
+  const user = useAppSelector((state) => state.auth.user);
+
   const navigation = useNavigation<StackNavigationProp<any>>();
-  const [games, setGames] = React.useState<Game[]>([
-    {
-      _id: "",
-      title: "jogo mockado",
-      description: "descricao mocada",
-      dateTime: new Date(),
-      location: {
-        latitude: 3824783,
-        longitude: 23847283,
-      },
-      organizer: "",
-      playerList: [""],
-    },
-  ]);
+  const [games, setGames] = React.useState<Game[]>();
   const [refreshing, setRefreshing] = React.useState(false);
 
   async function getGames() {
-    const { response, error } = await tryCatchRequest(api.get("/games"));
+    const { response, error } = await tryCatchRequest(
+      api.get(`/games/user/${user._id}`)
+    );
 
     if (error || response?.status !== 200) {
       console.log(error);
@@ -89,13 +82,18 @@ export default function Games() {
 
   return (
     <Container>
-      <Title>Jogos</Title>
+      <HeaderContainer>
+        <GoBackButton onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={20} color="#fff" />
+        </GoBackButton>
+        <Title>Jogos Criados por Você</Title>
+      </HeaderContainer>
       <GameListingContainer
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {games.map((game, index) => (
+        {games?.map((game, index) => (
           <GameContainer
             key={index.toString()}
             onPress={() => navigation.navigate("GameDetails", { game })}
@@ -123,9 +121,6 @@ export default function Games() {
           </GameContainer>
         ))}
       </GameListingContainer>
-      <CreateGameButton onPress={() => navigation.navigate("CreateGame")}>
-        <CreateGameButtonText>Criar Partida</CreateGameButtonText>
-      </CreateGameButton>
     </Container>
   );
 }
