@@ -12,6 +12,10 @@ import {
   Title,
   TopMapContainer,
   StarRatingLabel,
+  DeleteGameButton,
+  DeleteGameButtonText,
+  EditGameButton,
+  EditGameButtonText,
 } from "./styles";
 import MapView from "react-native-maps";
 import { useNavigation } from "@react-navigation/native";
@@ -34,7 +38,7 @@ export interface UserProps {
 }
 
 export default function GameDetails({ route }: any) {
-  const gameFromParams: Game = route.params.game;
+  const gameFromParams = useAppSelector((state) => state.game.selectedGame);
 
   const [game, setGame] = React.useState<Game>();
   const [isJoined, setIsJoined] = React.useState(false);
@@ -63,11 +67,9 @@ export default function GameDetails({ route }: any) {
     }
 
     setGame(response.data);
-    console.log(response.data.playerList);
     setIsJoined(
-      response.data.playerList.filter(
-        (p: UserProps) => p._id === "64596654f710fb047282cc65"
-      ).length > 0
+      response.data.playerList.filter((p: UserProps) => p._id === user._id)
+        .length > 0
     );
     setLoadingGameData(false);
   }
@@ -190,6 +192,23 @@ export default function GameDetails({ route }: any) {
     await getGameData();
   }
 
+  async function handleDeleteGame() {
+    setLoading(true);
+    const { response, error } = await tryCatchRequest(
+      api.delete(`/games/${gameFromParams._id}`)
+    );
+
+    if (error || response?.status !== 200) {
+      console.log(error);
+      return;
+    }
+
+    setLoading(false);
+    navigation.goBack();
+  }
+
+  const loggedUserIsOrganizer = game?.organizer._id === user._id;
+
   if (loadingGameData) {
     return (
       <Container>
@@ -221,6 +240,7 @@ export default function GameDetails({ route }: any) {
         </GoBackButton>
       </TopMapContainer>
       <Title>{game?.title}</Title>
+
       <DateAndTime>{formatDateTime(game?.dateTime || new Date())}</DateAndTime>
       <StarRatingContainer>
         <StarRating rating={rating} onPress={onRating} />
@@ -244,23 +264,60 @@ export default function GameDetails({ route }: any) {
       {game?.playerList.map((player: any, index) => (
         <Description key={index.toString()}>{player.fullName}</Description>
       ))}
-      {isJoined ? (
-        <JoinedGameButton onPress={handleRemoveFromGame}>
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <JoinGameButtonText>Você está no jogo!</JoinGameButtonText>
-          )}
-        </JoinedGameButton>
-      ) : (
-        <JoinGameButton onPress={handleAddToGame}>
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <JoinGameButtonText>Participar do Jogo</JoinGameButtonText>
-          )}
-        </JoinGameButton>
+
+      {loggedUserIsOrganizer && (
+        <>
+          <DeleteGameButton onPress={handleDeleteGame}>
+            <DeleteGameButtonText>Apagar Jogo</DeleteGameButtonText>
+          </DeleteGameButton>
+          <EditGameButton onPress={() => navigation.navigate("EditGame")}>
+            <EditGameButtonText>Editar Jogo</EditGameButtonText>
+          </EditGameButton>
+        </>
+      )}
+
+      {!loggedUserIsOrganizer && (
+        <JoinButton
+          isJoined={isJoined}
+          loading={loading}
+          handleAddToGame={handleAddToGame}
+          handleRemoveFromGame={handleRemoveFromGame}
+        />
       )}
     </Container>
+  );
+}
+
+function JoinButton({
+  isJoined,
+  loading,
+  handleAddToGame,
+  handleRemoveFromGame,
+}: {
+  isJoined: boolean;
+  loading: boolean;
+  handleAddToGame: () => void;
+  handleRemoveFromGame: () => void;
+}) {
+  if (!isJoined) {
+    return (
+      <JoinGameButton onPress={handleAddToGame}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <JoinGameButtonText>Participar do Jogo</JoinGameButtonText>
+        )}
+      </JoinGameButton>
+    );
+  }
+
+  return (
+    <JoinedGameButton onPress={handleRemoveFromGame}>
+      {loading ? (
+        <ActivityIndicator color="#fff" />
+      ) : (
+        <JoinGameButtonText>Você está no jogo!</JoinGameButtonText>
+      )}
+    </JoinedGameButton>
   );
 }

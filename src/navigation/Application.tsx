@@ -16,6 +16,7 @@ import {
   Profile,
   UserGames,
   EditProfile,
+  EditGame,
 } from "src/screens";
 import { Provider } from "react-redux";
 import { store, persistor } from "src/redux/store";
@@ -75,6 +76,7 @@ export default function Application() {
               <Stack.Screen name="TabContainer" component={TabContainer} />
               <Stack.Screen name="UserGames" component={UserGames} />
               <Stack.Screen name="EditProfile" component={EditProfile} />
+              <Stack.Screen name="EditGame" component={EditGame} />
             </Stack.Navigator>
           </NavigationContainer>
         </ThemeProvider>

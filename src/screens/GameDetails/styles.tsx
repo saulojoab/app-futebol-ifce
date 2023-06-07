@@ -104,3 +104,47 @@ export const StarRatingLabel = styled.Text`
   margin-left: ${responsive(10)}px;
   font-weight: 200;
 `;
+
+export const DeleteGameButton = styled.TouchableOpacity`
+  background-color: red;
+  padding: ${responsive(20)}px;
+  border-radius: ${responsive(50)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  position: absolute;
+  bottom: ${responsive(20)}px;
+  left: 50%;
+  right: ${responsive(20)}px;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+  align-self: center;
+`;
+
+export const DeleteGameButtonText = styled.Text`
+  color: ${(props) => props.theme.colors.white};
+  font-size: ${responsive(16)}px;
+  text-align: center;
+`;
+
+export const EditGameButton = styled.TouchableOpacity`
+  background-color: ${(props) => props.theme.colors.primary};
+  padding: ${responsive(20)}px;
+  border-radius: ${responsive(50)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  position: absolute;
+  bottom: ${responsive(20)}px;
+  left: ${responsive(10)}px;
+  right: 51%;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+  align-self: center;
+`;
+
+export const EditGameButtonText = styled.Text`
+  color: ${(props) => props.theme.colors.white};
+  font-size: ${responsive(16)}px;
+  text-align: center;
+`;

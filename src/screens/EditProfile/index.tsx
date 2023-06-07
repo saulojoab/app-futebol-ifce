@@ -96,7 +96,7 @@ export default function EditUser() {
       />
 
       <OutlinedButton disabled={isButtonDisabled} onPress={updateUserData}>
-        <ButtonText>Editar</ButtonText>
+        <ButtonText>Salvar</ButtonText>
       </OutlinedButton>
     </Container>
   );

@@ -7,3 +7,4 @@ export { default as GameDetails } from "./GameDetails";
 export { default as Profile } from "./Profile";
 export { default as UserGames } from "./UserGames";
 export { default as EditProfile } from "./EditProfile";
+export { default as EditGame } from "./EditGame";

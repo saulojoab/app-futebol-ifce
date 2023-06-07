@@ -20,6 +20,9 @@ import { api } from "src/services/api";
 import { RefreshControl } from "react-native";
 import MapView from "react-native-maps";
 import responsive from "src/global/utils/responsive";
+import { UserProps } from "../GameDetails";
+import { useAppDispatch } from "src/hooks/redux";
+import { setSelectedGame } from "src/redux/features/gameSlice";
 
 export interface Game {
   _id: string;
@@ -30,27 +33,16 @@ export interface Game {
     latitude: number;
     longitude: number;
   };
-  organizer: string;
+  organizer: UserProps;
   playerList: string[];
 }
 
 export default function Games() {
   const navigation = useNavigation<StackNavigationProp<any>>();
-  const [games, setGames] = React.useState<Game[]>([
-    {
-      _id: "",
-      title: "jogo mockado",
-      description: "descricao mocada",
-      dateTime: new Date(),
-      location: {
-        latitude: 3824783,
-        longitude: 23847283,
-      },
-      organizer: "",
-      playerList: [""],
-    },
-  ]);
+  const [games, setGames] = React.useState<Game[]>([]);
   const [refreshing, setRefreshing] = React.useState(false);
+
+  const dispatch = useAppDispatch();
 
   async function getGames() {
     const { response, error } = await tryCatchRequest(api.get("/games"));
@@ -69,11 +61,11 @@ export default function Games() {
     getGames();
   }, []);
 
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = async () => {
     setRefreshing(true);
     await getGames();
     setRefreshing(false);
-  }, []);
+  };
 
   //a function that formats a dateTime object to dd/mm/yyyy hh:mm
   function formatDateTime(dateTime: Date) {
@@ -87,6 +79,11 @@ export default function Games() {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
+  function handleGameDetails(game: Game) {
+    dispatch(setSelectedGame(game));
+    navigation.navigate("GameDetails");
+  }
+
   return (
     <Container>
       <Title>Jogos</Title>
@@ -98,7 +95,7 @@ export default function Games() {
         {games.map((game, index) => (
           <GameContainer
             key={index.toString()}
-            onPress={() => navigation.navigate("GameDetails", { game })}
+            onPress={() => handleGameDetails(game)}
           >
             <MapContainer>
               <MapView
