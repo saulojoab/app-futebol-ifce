@@ -92,33 +92,41 @@ export default function Games() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {games.map((game, index) => (
-          <GameContainer
-            key={index.toString()}
-            onPress={() => handleGameDetails(game)}
-          >
-            <MapContainer>
-              <MapView
-                style={{ width: responsive(150), height: responsive(150) }}
-                initialRegion={{
-                  latitude: game.location.latitude,
-                  longitude: game.location.longitude,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
-                }}
-                scrollEnabled={false}
-                zoomEnabled={false}
-                pitchEnabled={false}
-                rotateEnabled={false}
-              />
-            </MapContainer>
-            <GameInformationContainer>
-              <GameTitle>{game.title}</GameTitle>
-              <GameDescription>{game.description}</GameDescription>
-              <GameDescription>{formatDateTime(game.dateTime)}</GameDescription>
-            </GameInformationContainer>
-          </GameContainer>
-        ))}
+        {games &&
+          games
+            .sort(
+              (a, b) =>
+                new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
+            )
+            .map((game, index) => (
+              <GameContainer
+                key={index.toString()}
+                onPress={() => handleGameDetails(game)}
+              >
+                <MapContainer>
+                  <MapView
+                    style={{ width: responsive(150), height: responsive(150) }}
+                    initialRegion={{
+                      latitude: game.location.latitude,
+                      longitude: game.location.longitude,
+                      latitudeDelta: 0.0922,
+                      longitudeDelta: 0.0421,
+                    }}
+                    scrollEnabled={false}
+                    zoomEnabled={false}
+                    pitchEnabled={false}
+                    rotateEnabled={false}
+                  />
+                </MapContainer>
+                <GameInformationContainer>
+                  <GameTitle>{game.title}</GameTitle>
+                  <GameDescription>{game.description}</GameDescription>
+                  <GameDescription>
+                    {formatDateTime(game.dateTime)}
+                  </GameDescription>
+                </GameInformationContainer>
+              </GameContainer>
+            ))}
       </GameListingContainer>
       <CreateGameButton onPress={() => navigation.navigate("CreateGame")}>
         <CreateGameButtonText>Criar Partida</CreateGameButtonText>

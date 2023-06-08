@@ -24,6 +24,7 @@ import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 import { ActivityIndicator } from "react-native";
 import { useAppSelector } from "src/hooks/redux";
+import Toast from "react-native-toast-message";
 
 export default function CreateGame() {
   const [dateTime, setDateTime] = React.useState<string>("");
@@ -60,14 +61,18 @@ export default function CreateGame() {
       organizer: user._id,
     };
 
-    console.log(game);
-
     setLoading(true);
 
     const { response, error } = await tryCatchRequest(api.post("/games", game));
 
     if (error || response?.status !== 201) {
       console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Erro ao criar jogo",
+        text2: "Verifique sua conexão com a internet e tente novamente",
+        position: "bottom",
+      });
       setLoading(false);
       return;
     }
@@ -75,8 +80,16 @@ export default function CreateGame() {
     setLoading(false);
 
     console.log(response);
+    Toast.show({
+      type: "success",
+      text1: "Jogo criado com sucesso",
+      position: "bottom",
+    });
     navigation.navigate("Jogos");
   }
+
+  const isButtonDisabled =
+    !title || !description || !gameLocation || !dateTime || loading;
 
   return (
     <Container>
@@ -132,13 +145,14 @@ export default function CreateGame() {
           <Icon name="map-marker" size={70} color="red" />
         </IconOnMiddleOfMap>
       </MapContainer>
-      <CreateGameButton disabled={loading} onPress={createGame}>
+      <CreateGameButton disabled={isButtonDisabled} onPress={createGame}>
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <CreateGameButtonText>Criar Partida</CreateGameButtonText>
         )}
       </CreateGameButton>
+      <Toast />
     </Container>
   );
 }

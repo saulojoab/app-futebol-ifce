@@ -40,8 +40,13 @@ export const IconOnMiddleOfMap = styled.View`
   margin-top: -${responsive(40)}px;
 `;
 
-export const CreateGameButton = styled.TouchableOpacity`
-  background-color: ${(props) => props.theme.colors.primary};
+interface CreateGameButtonProps {
+  disabled?: boolean;
+}
+
+export const CreateGameButton = styled.TouchableOpacity<CreateGameButtonProps>`
+  background-color: ${(props) =>
+    props.disabled ? props.theme.colors.gray : props.theme.colors.primary};
   padding: 10px;
   border-radius: 10px;
   margin-top: 20px;

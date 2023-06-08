@@ -21,6 +21,7 @@ import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 import { setLoginStatus, updateUser } from "src/redux/features/authSlice";
 import { useAppDispatch } from "src/hooks/redux";
+import Toast from "react-native-toast-message";
 
 export default function Login() {
   const [email, setEmail] = React.useState("");
@@ -52,14 +53,18 @@ export default function Login() {
 
     if (error || response?.status !== 200) {
       console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Erro ao fazer login",
+        text2: "Verifique suas credenciais e tente novamente",
+        position: "bottom",
+      });
       setLoading(false);
       return;
     }
 
     dispatch(setLoginStatus(true));
     dispatch(updateUser(response.data.user));
-
-    console.log(response.data.user);
 
     setLoading(false);
     navigation.navigate("TabContainer");
@@ -100,6 +105,7 @@ export default function Login() {
       <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
         <SignupText>Não possui uma conta? Cadastre-se</SignupText>
       </TouchableOpacity>
+      <Toast />
     </Container>
   );
 }

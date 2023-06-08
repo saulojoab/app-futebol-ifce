@@ -26,6 +26,7 @@ import { api } from "src/services/api";
 import { ActivityIndicator } from "react-native";
 import { StarRating } from "src/components";
 import { useAppSelector } from "src/hooks/redux";
+import Toast from "react-native-toast-message";
 
 export interface UserProps {
   _id: string;
@@ -174,6 +175,11 @@ export default function GameDetails({ route }: any) {
     }
 
     setLoading(false);
+    Toast.show({
+      type: "success",
+      text1: "Sucesso",
+      text2: "Você entrou no jogo!",
+    });
     await getGameData();
   }
 
@@ -204,6 +210,11 @@ export default function GameDetails({ route }: any) {
     }
 
     setLoading(false);
+    Toast.show({
+      type: "success",
+      text1: "Sucesso",
+      text2: "Você cancelou o jogo!",
+    });
     navigation.goBack();
   }
 
@@ -268,7 +279,7 @@ export default function GameDetails({ route }: any) {
       {loggedUserIsOrganizer && (
         <>
           <DeleteGameButton onPress={handleDeleteGame}>
-            <DeleteGameButtonText>Apagar Jogo</DeleteGameButtonText>
+            <DeleteGameButtonText>Cancelar Jogo</DeleteGameButtonText>
           </DeleteGameButton>
           <EditGameButton onPress={() => navigation.navigate("EditGame")}>
             <EditGameButtonText>Editar Jogo</EditGameButtonText>
@@ -284,6 +295,7 @@ export default function GameDetails({ route }: any) {
           handleRemoveFromGame={handleRemoveFromGame}
         />
       )}
+      <Toast />
     </Container>
   );
 }
