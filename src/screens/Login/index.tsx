@@ -1,18 +1,8 @@
 // a login screen that uses an email and password to authenticate the user
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-import {
-  Container,
-  Logo,
-  Title,
-  ButtonText,
-  ForgotText,
-  OutlinedButton,
-  ForgotPassword,
-  SignupText,
-} from "./styles";
 import { TextInput } from "src/components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { ActivityIndicator, TouchableOpacity } from "react-native";
@@ -20,13 +10,19 @@ import logo from "src/assets/images/Gamefinder-4.png";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
 import { api } from "src/services/api";
 import { setLoginStatus, updateUser } from "src/redux/features/authSlice";
-import { useAppDispatch } from "src/hooks/redux";
+import { useAppDispatch, useAppSelector } from "src/hooks/redux";
 import Toast from "react-native-toast-message";
+import styled from "styled-components/native";
+import responsive from "src/global/utils/responsive";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { useTheme } from "styled-components";
 
 export default function Login() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+
+  const user = useAppSelector((state) => state.auth.user);
 
   const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
@@ -34,6 +30,14 @@ export default function Login() {
   const isButtonDisabled = !isEmailValid || password.length < 6;
 
   const navigation = useNavigation<StackNavigationProp<any>>();
+  const theme = useTheme();
+
+  function checkAuth() {
+    if (user.email !== "") {
+      navigation.navigate("TabContainer");
+      return;
+    }
+  }
 
   const dispatch = useAppDispatch();
 
@@ -70,16 +74,27 @@ export default function Login() {
     navigation.navigate("TabContainer");
   }
 
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   return (
     <Container>
       <Logo source={logo} />
-      <Title>Olá, seja bem vindo(a)</Title>
+      <Title>Olá, seja bem vindo(a).</Title>
       <TextInput
         value={email}
         onChangeText={(text) => setEmail(text)}
         placeholder="Email"
         autoCapitalize={"none"}
         keyboardType="email-address"
+        icon={
+          <Icon
+            name="envelope"
+            color={theme.colors.background}
+            size={responsive(15)}
+          />
+        }
       />
       <TextInput
         value={password}
@@ -87,13 +102,14 @@ export default function Login() {
         placeholder="Senha"
         secureTextEntry={true}
         autoCapitalize={"none"}
+        icon={
+          <Icon
+            name="lock"
+            color={theme.colors.background}
+            size={responsive(15)}
+          />
+        }
       />
-      <ForgotPassword
-        disabled={isButtonDisabled}
-        onPress={() => console.log("Forgot")}
-      >
-        <ForgotText>Esqueci minha senha</ForgotText>
-      </ForgotPassword>
       <OutlinedButton disabled={isButtonDisabled || loading} onPress={login}>
         {loading ? (
           <ActivityIndicator color="#fff" />
@@ -109,3 +125,59 @@ export default function Login() {
     </Container>
   );
 }
+
+interface ButtonProps {
+  disabled: boolean;
+}
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${(props) => props.theme.colors.white};
+  padding: ${responsive(30)}px;
+  justify-content: center;
+`;
+
+const Logo = styled.Image`
+  width: 215px;
+  height: 215px;
+  margin-top: ${responsive(-60)}px;
+  margin-bottom: ${responsive(46)}px;
+  align-self: center;
+`;
+
+const Title = styled.Text`
+  font-size: 24px;
+  color: ${(props) => props.theme.colors.primary};
+  margin-bottom: ${responsive(10)}px;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const OutlinedButton = styled.TouchableOpacity<ButtonProps>`
+  height: ${responsive(45)}px;
+  width: 75%;
+  background-color: ${(props) =>
+    props.disabled
+      ? props.theme.colors.background
+      : props.theme.colors.secondary};
+
+  border-radius: 7.5px;
+  padding: ${responsive(10)}px;
+  margin-top: ${responsive(50)}px;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+`;
+
+const ButtonText = styled.Text`
+  font-size: ${responsive(16)}px;
+  color: ${(props) => props.theme.colors.white};
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const SignupText = styled.Text`
+  font-size: ${responsive(16)}px;
+  color: ${(props) => props.theme.colors.seaBlue};
+  margin-top: ${responsive(30)}px;
+  text-align: center;
+  font-family: ${(props) => props.theme.fonts.regular};
+`;

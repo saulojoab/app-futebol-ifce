@@ -1,18 +1,6 @@
 // react native function component with a text inside
 
 import React, { useEffect } from "react";
-import {
-  Container,
-  CreateGameButton,
-  CreateGameButtonText,
-  GameContainer,
-  GameDescription,
-  GameInformationContainer,
-  GameListingContainer,
-  GameTitle,
-  MapContainer,
-  Title,
-} from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import tryCatchRequest from "src/global/utils/tryCatchRequest";
@@ -23,6 +11,8 @@ import responsive from "src/global/utils/responsive";
 import { UserProps } from "../GameDetails";
 import { useAppDispatch } from "src/hooks/redux";
 import { setSelectedGame } from "src/redux/features/gameSlice";
+import styled, { useTheme } from "styled-components/native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export interface Game {
   _id: string;
@@ -43,6 +33,7 @@ export default function Games() {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const dispatch = useAppDispatch();
+  const theme = useTheme();
 
   async function getGames() {
     const { response, error } = await tryCatchRequest(api.get("/games"));
@@ -86,7 +77,16 @@ export default function Games() {
 
   return (
     <Container>
-      <Title>Jogos</Title>
+      <TitleAddContainer>
+        <Title>Jogos</Title>
+        <TitleIconContainer onPress={() => navigation.navigate("CreateGame")}>
+          <Icon
+            name="plus"
+            size={responsive(20)}
+            color={theme.colors.seaBlue}
+          />
+        </TitleIconContainer>
+      </TitleAddContainer>
       <GameListingContainer
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -105,7 +105,11 @@ export default function Games() {
               >
                 <MapContainer>
                   <MapView
-                    style={{ width: responsive(150), height: responsive(150) }}
+                    style={{
+                      width: responsive(100),
+                      height: responsive(100),
+                      borderRadius: 10,
+                    }}
                     initialRegion={{
                       latitude: game.location.latitude,
                       longitude: game.location.longitude,
@@ -121,16 +125,101 @@ export default function Games() {
                 <GameInformationContainer>
                   <GameTitle>{game.title}</GameTitle>
                   <GameDescription>{game.description}</GameDescription>
-                  <GameDescription>
-                    {formatDateTime(game.dateTime)}
-                  </GameDescription>
+                  <GameTime>{formatDateTime(game.dateTime)}</GameTime>
                 </GameInformationContainer>
+                <GameButtonContainer>
+                  <Icon
+                    name="chevron-right"
+                    size={20}
+                    color={theme.colors.seaBlue}
+                  />
+                </GameButtonContainer>
               </GameContainer>
             ))}
       </GameListingContainer>
-      <CreateGameButton onPress={() => navigation.navigate("CreateGame")}>
-        <CreateGameButtonText>Criar Partida</CreateGameButtonText>
-      </CreateGameButton>
     </Container>
   );
 }
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${(props) => props.theme.colors.white};
+  padding: 10px;
+  padding-top: 60px;
+`;
+
+const Title = styled.Text`
+  color: ${(props) => props.theme.colors.black};
+  font-size: ${responsive(30)}px;
+  margin-left: ${responsive(10)}px;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const TitleAddContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+const TitleIconContainer = styled.TouchableOpacity`
+  padding: 10px;
+  border-radius: 10px;
+`;
+
+const GameListingContainer = styled.ScrollView`
+  margin-top: 20px;
+`;
+
+const GameContainer = styled.TouchableOpacity`
+  padding: ${responsive(10)}px;
+  margin-top: ${responsive(10)}px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+`;
+
+const GameTitle = styled.Text`
+  color: ${(props) => props.theme.colors.black};
+  font-size: ${responsive(20)}px;
+  text-align: left;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const GameDescription = styled.Text`
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${responsive(14)}px;
+  text-align: left;
+  margin-top: ${responsive(5)}px;
+  font-family: ${(props) => props.theme.fonts.medium};
+  max-width: ${responsive(200)}px;
+`;
+
+const GameTime = styled.Text`
+  color: ${(props) => props.theme.colors.seaBlue};
+  font-size: ${responsive(14)}px;
+  text-align: left;
+  margin-top: ${responsive(5)}px;
+  font-family: ${(props) => props.theme.fonts.regular};
+`;
+
+const GameButtonContainer = styled.View`
+  align-items: flex-end;
+  justify-content: center;
+  flex: 1;
+`;
+
+const MapContainer = styled.View`
+  background-color: ${(props) => props.theme.colors.white};
+`;
+
+const GameInformationContainer = styled.View`
+  background-color: ${(props) => props.theme.colors.white};
+  padding: ${responsive(10)}px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding-left: ${responsive(20)}px;
+`;

@@ -46,8 +46,11 @@ const authSlice = createSlice({
       };
       return newState;
     },
+    logout: (state) => {
+      return initialState;
+    },
   },
 });
 
-export const { updateUser, setLoginStatus } = authSlice.actions;
+export const { updateUser, setLoginStatus, logout } = authSlice.actions;
 export default authSlice.reducer;

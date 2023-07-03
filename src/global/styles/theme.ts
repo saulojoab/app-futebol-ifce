@@ -8,6 +8,7 @@ export default {
     white: "#FFFFFF",
     gray: "#E5E5E5",
     success: "#00A49B",
+    error: "#c42727",
   },
   shadows: {
     light: 1,
@@ -17,6 +18,11 @@ export default {
     huge: 30,
   },
   fonts: {
-    default: "OpenSans-Regular",
+    regular: "DMSans-Regular",
+    medium: "DMSans-Medium",
+    bold: "DMSans-Bold",
+    boldItalic: "DMSans-BoldItalic",
+    italic: "DMSans-Italic",
+    mediumItalic: "DMSans-MediumItalic",
   },
 };

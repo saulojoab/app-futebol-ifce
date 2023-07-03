@@ -1,18 +1,6 @@
 // react native function component with a text inside
 
 import React from "react";
-import {
-  Container,
-  CreateGameButton,
-  CreateGameButtonText,
-  FormContainer,
-  GoBackButton,
-  IconOnMiddleOfMap,
-  InputLabel,
-  MapContainer,
-  Title,
-  TitleContainer,
-} from "./styles";
 import { TextInput } from "src/components";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
@@ -25,6 +13,9 @@ import { api } from "src/services/api";
 import { ActivityIndicator } from "react-native";
 import { useAppSelector } from "src/hooks/redux";
 import Toast from "react-native-toast-message";
+import styled from "styled-components/native";
+import responsive from "src/global/utils/responsive";
+import { useTheme } from "styled-components";
 
 export default function CreateGame() {
   const [dateTime, setDateTime] = React.useState<string>("");
@@ -38,6 +29,8 @@ export default function CreateGame() {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const user = useAppSelector((state) => state.auth.user);
 
+  const theme = useTheme();
+
   Geolocation.getCurrentPosition(
     (position) => {
       const { latitude, longitude } = position.coords;
@@ -49,12 +42,13 @@ export default function CreateGame() {
 
   const handleConfirm = (date: Date) => {
     console.warn("A date has been picked: ", date);
+    setDateTime(date.toISOString());
     setDatePickerVisibility(false);
   };
 
   async function createGame() {
     const game = {
-      dateTime: new Date(),
+      dateTime: dateTime,
       title,
       description,
       location: gameLocation,
@@ -94,14 +88,14 @@ export default function CreateGame() {
   return (
     <Container>
       <TitleContainer>
-        <GoBackButton onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={20} color="#fff" />
-        </GoBackButton>
+        <FloatingButton onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={20} color={theme.colors.seaBlue} />
+        </FloatingButton>
         <Title>Criar Partida</Title>
       </TitleContainer>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
-        mode="date"
+        mode="datetime"
         onConfirm={handleConfirm}
         onCancel={() => setDatePickerVisibility(false)}
       />
@@ -111,6 +105,7 @@ export default function CreateGame() {
           value={title}
           onChangeText={(text) => setTitle(text)}
           placeholder="Ex: Rachinha do Thiago"
+          icon={<Icon name="futbol-o" size={20} color={theme.colors.seaBlue} />}
           //onFocus={() => setDatePickerVisibility(true)}
         />
         <InputLabel>Data e Hora</InputLabel>
@@ -118,7 +113,8 @@ export default function CreateGame() {
           value={dateTime}
           onChangeText={(text) => setDateTime(text)}
           placeholder="Data e hora"
-          //onFocus={() => setDatePickerVisibility(true)}
+          icon={<Icon name="calendar" size={20} color={theme.colors.seaBlue} />}
+          onFocus={() => setDatePickerVisibility(true)}
         />
         <InputLabel>Descrição</InputLabel>
         <TextInput
@@ -156,3 +152,83 @@ export default function CreateGame() {
     </Container>
   );
 }
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${(props) => props.theme.colors.white};
+  padding-top: 50px;
+  padding-bottom: 40px;
+`;
+
+const Title = styled.Text`
+  color: ${(props) => props.theme.colors.seaBlue};
+  font-size: ${responsive(30)}px;
+  margin-left: ${responsive(15)}px;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const FloatingButton = styled.TouchableOpacity`
+  background-color: ${(props) => props.theme.colors.white};
+  padding: ${responsive(10)}px;
+  width: ${responsive(55)}px;
+  height: ${responsive(55)}px;
+  align-items: center;
+  justify-content: center;
+  border-radius: ${responsive(100)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+`;
+
+const TitleContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  padding-top: ${responsive(15)}px;
+  padding-left: ${responsive(15)}px;
+`;
+
+const MapContainer = styled.View`
+  flex: 1;
+  background-color: ${(props) => props.theme.colors.white};
+`;
+
+const IconOnMiddleOfMap = styled.View`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -${responsive(20)}px;
+  margin-top: -${responsive(40)}px;
+`;
+
+interface CreateGameButtonProps {
+  disabled?: boolean;
+}
+
+const CreateGameButton = styled.TouchableOpacity<CreateGameButtonProps>`
+  background-color: ${(props) =>
+    props.disabled ? props.theme.colors.gray : props.theme.colors.seaBlue};
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 20px;
+  margin: ${responsive(20)}px;
+`;
+
+const CreateGameButtonText = styled.Text`
+  color: ${(props) => props.theme.colors.white};
+  font-size: ${responsive(20)}px;
+  text-align: center;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const InputLabel = styled.Text`
+  color: ${(props) => props.theme.colors.black};
+  font-size: ${responsive(18)}px;
+  margin-top: ${responsive(20)}px;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const FormContainer = styled.View`
+  padding: ${responsive(15)}px;
+`;

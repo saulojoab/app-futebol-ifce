@@ -1,22 +1,5 @@
 import React, { useEffect } from "react";
 import { Game } from "../Games";
-import {
-  Container,
-  DateAndTime,
-  Description,
-  GoBackButton,
-  JoinGameButton,
-  JoinGameButtonText,
-  JoinedGameButton,
-  StarRatingContainer,
-  Title,
-  TopMapContainer,
-  StarRatingLabel,
-  DeleteGameButton,
-  DeleteGameButtonText,
-  EditGameButton,
-  EditGameButtonText,
-} from "./styles";
 import MapView from "react-native-maps";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -27,6 +10,8 @@ import { ActivityIndicator } from "react-native";
 import { StarRating } from "src/components";
 import { useAppSelector } from "src/hooks/redux";
 import Toast from "react-native-toast-message";
+import styled, { useTheme } from "styled-components/native";
+import responsive from "src/global/utils/responsive";
 
 export interface UserProps {
   _id: string;
@@ -52,6 +37,8 @@ export default function GameDetails({ route }: any) {
 
   const navigation = useNavigation<StackNavigationProp<any>>();
   const user = useAppSelector((state) => state.auth.user);
+
+  const theme = useTheme();
 
   async function getGameData() {
     setLoadingGameData(true);
@@ -166,7 +153,7 @@ export default function GameDetails({ route }: any) {
   async function handleAddToGame() {
     setLoading(true);
     const { response, error } = await tryCatchRequest(
-      api.post(`/games/${gameFromParams._id}/64596654f710fb047282cc65`)
+      api.post(`/games/${gameFromParams._id}/${user._id}`)
     );
 
     if (error || response?.status !== 200) {
@@ -246,46 +233,65 @@ export default function GameDetails({ route }: any) {
           pitchEnabled={false}
           rotateEnabled={false}
         />
-        <GoBackButton onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={20} color="#fff" />
-        </GoBackButton>
+        <FloatingButtonContainer>
+          <FloatingButton onPress={() => navigation.goBack()}>
+            <Icon
+              name="chevron-left"
+              size={responsive(20)}
+              color={theme.colors.seaBlue}
+            />
+          </FloatingButton>
+
+          {loggedUserIsOrganizer && (
+            <RightFloatingButtonContainer>
+              <FloatingButton onPress={() => navigation.navigate("EditGame")}>
+                <Icon
+                  name="pencil"
+                  size={responsive(20)}
+                  color={theme.colors.seaBlue}
+                />
+              </FloatingButton>
+              <FloatingButton onPress={handleDeleteGame}>
+                <Icon
+                  name="trash"
+                  size={responsive(20)}
+                  color={theme.colors.error}
+                />
+              </FloatingButton>
+            </RightFloatingButtonContainer>
+          )}
+        </FloatingButtonContainer>
       </TopMapContainer>
       <Title>{game?.title}</Title>
-
       <DateAndTime>{formatDateTime(game?.dateTime || new Date())}</DateAndTime>
-      <StarRatingContainer>
-        <StarRating rating={rating} onPress={onRating} />
-        {loadingGameRating ? (
-          <ActivityIndicator />
-        ) : (
-          <StarRatingLabel>
-            {ratingFromGame ? ratingFromGame.toFixed(1) : 0}/5
-          </StarRatingLabel>
-        )}
-      </StarRatingContainer>
 
-      <Description>{game?.description}</Description>
-      {gameHasPlayers ? (
-        <Description style={{ fontWeight: "bold" }}>
-          Lista de Jogadores:
-        </Description>
-      ) : (
-        <Description>Não há jogadores nesse jogo</Description>
-      )}
-      {game?.playerList.map((player: any, index) => (
-        <Description key={index.toString()}>{player.fullName}</Description>
-      ))}
-
-      {loggedUserIsOrganizer && (
+      {game && game.dateTime > new Date() && (
         <>
-          <DeleteGameButton onPress={handleDeleteGame}>
-            <DeleteGameButtonText>Cancelar Jogo</DeleteGameButtonText>
-          </DeleteGameButton>
-          <EditGameButton onPress={() => navigation.navigate("EditGame")}>
-            <EditGameButtonText>Editar Jogo</EditGameButtonText>
-          </EditGameButton>
+          <SectionTitle>Nota do Jogo</SectionTitle>
+          <StarRatingContainer>
+            <StarRating rating={rating} onPress={onRating} />
+            {loadingGameRating ? (
+              <ActivityIndicator />
+            ) : (
+              <StarRatingLabel>
+                {ratingFromGame ? ratingFromGame.toFixed(1) : 0}/5
+              </StarRatingLabel>
+            )}
+          </StarRatingContainer>
         </>
       )}
+
+      <SectionTitle>Descrição do Jogo</SectionTitle>
+      <Description>{game?.description}</Description>
+
+      <SectionTitle>Jogadores</SectionTitle>
+
+      <Description>1. {game?.organizer.fullName} (Organizador)</Description>
+      {game?.playerList.map((player: any, index) => (
+        <Description key={index.toString()}>
+          {index + 2}. {player.fullName}
+        </Description>
+      ))}
 
       {!loggedUserIsOrganizer && (
         <JoinButton
@@ -328,8 +334,185 @@ function JoinButton({
       {loading ? (
         <ActivityIndicator color="#fff" />
       ) : (
-        <JoinGameButtonText>Você está no jogo!</JoinGameButtonText>
+        <JoinGameButtonText>Cancelar Participação</JoinGameButtonText>
       )}
     </JoinedGameButton>
   );
 }
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${(props) => props.theme.colors.white};
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+`;
+
+const TopMapContainer = styled.View`
+  width: 100%;
+  height: ${responsive(250)}px;
+`;
+
+const Title = styled.Text`
+  font-size: ${responsive(30)}px;
+  color: ${(props) => props.theme.colors.black};
+  font-family: ${(props) => props.theme.fonts.bold};
+  margin-left: ${responsive(20)}px;
+  margin-top: ${responsive(20)}px;
+`;
+
+const DateAndTime = styled.Text`
+  font-size: ${responsive(16)}px;
+  color: ${(props) => props.theme.colors.seaBlue};
+  font-family: ${(props) => props.theme.fonts.regular};
+  margin-left: ${responsive(20)}px;
+  margin-top: ${responsive(5)}px;
+`;
+
+const Description = styled.Text`
+  font-size: ${responsive(16)}px;
+  color: ${(props) => props.theme.colors.black};
+  margin-bottom: ${responsive(10)}px;
+  margin-left: ${responsive(20)}px;
+  margin-top: ${responsive(10)}px;
+  font-family: ${(props) => props.theme.fonts.regular};
+`;
+
+const FloatingButton = styled.TouchableOpacity`
+  background-color: ${(props) => props.theme.colors.white};
+  padding: ${responsive(10)}px;
+  width: ${responsive(55)}px;
+  height: ${responsive(55)}px;
+  align-items: center;
+  justify-content: center;
+  border-radius: ${responsive(100)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+`;
+
+const FloatingButtonContainer = styled.View`
+  position: absolute;
+  top: ${responsive(60)}px;
+  padding-right: ${responsive(20)}px;
+  padding-left: ${responsive(20)}px;
+  width: 100%;
+  z-index: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const RightFloatingButtonContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: ${responsive(20)}px;
+`;
+
+const JoinGameButton = styled.TouchableOpacity`
+  background-color: ${(props) => props.theme.colors.seaBlue};
+  padding: ${responsive(20)}px;
+  border-radius: ${responsive(10)}px;
+  position: absolute;
+  bottom: ${responsive(40)}px;
+  left: ${responsive(20)}px;
+  right: ${responsive(20)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+`;
+
+const JoinGameButtonText = styled.Text`
+  color: ${(props) => props.theme.colors.white};
+  font-size: ${responsive(18)}px;
+  text-align: center;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;
+
+const JoinedGameButton = styled.TouchableOpacity`
+  background-color: ${(props) => props.theme.colors.background};
+  padding: ${responsive(20)}px;
+  border-radius: ${responsive(10)}px;
+  position: absolute;
+  bottom: ${responsive(40)}px;
+  left: ${responsive(20)}px;
+  right: ${responsive(20)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+`;
+
+const StarRatingContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-left: ${responsive(20)}px;
+  margin-top: ${responsive(10)}px;
+`;
+
+const StarRatingLabel = styled.Text`
+  font-size: ${responsive(14)}px;
+  color: ${(props) => props.theme.colors.seaBlue};
+  margin-left: ${responsive(5)}px;
+  font-family: ${(props) => props.theme.fonts.regular};
+`;
+
+const DeleteGameButton = styled.TouchableOpacity`
+  background-color: red;
+  padding: ${responsive(20)}px;
+  border-radius: ${responsive(50)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  position: absolute;
+  bottom: ${responsive(20)}px;
+  left: 50%;
+  right: ${responsive(20)}px;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+  align-self: center;
+`;
+
+const DeleteGameButtonText = styled.Text`
+  color: ${(props) => props.theme.colors.white};
+  font-size: ${responsive(16)}px;
+  text-align: center;
+`;
+
+const EditGameButton = styled.TouchableOpacity`
+  background-color: ${(props) => props.theme.colors.primary};
+  padding: ${responsive(20)}px;
+  border-radius: ${responsive(50)}px;
+  shadow-color: ${(props) => props.theme.colors.black};
+  position: absolute;
+  bottom: ${responsive(20)}px;
+  left: ${responsive(10)}px;
+  right: 51%;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+  elevation: 5;
+  align-self: center;
+`;
+
+const EditGameButtonText = styled.Text`
+  color: ${(props) => props.theme.colors.white};
+  font-size: ${responsive(16)}px;
+  text-align: center;
+`;
+
+const SectionTitle = styled.Text`
+  font-size: ${responsive(20)}px;
+  color: ${(props) => props.theme.colors.seaBlue};
+  margin-left: ${responsive(20)}px;
+  margin-top: ${responsive(20)}px;
+  font-family: ${(props) => props.theme.fonts.bold};
+`;

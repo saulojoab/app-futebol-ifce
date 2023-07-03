@@ -1,6 +1,17 @@
 {
   "extends": "@tsconfig/react-native/tsconfig.json" /* Recommended React Native TSConfig base */,
   "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-styled-plugin",
+        "lint": {
+          "validProperties": [
+            "shadow-color,shadow-opacity,shadow-radius,shadow-offset,elevation"
+          ],
+          "unknownProperties": "ignore"
+        }
+      }
+    ],
     "types": ["react-native", "jest", "styled-components-react-native"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
